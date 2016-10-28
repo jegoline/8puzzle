@@ -7,8 +7,8 @@ import pygame, sys, random
 from pygame.locals import *
 
 # Create the constants (go ahead and experiment with different values)
-BOARDWIDTH = 4  # number of columns in the board
-BOARDHEIGHT = 4 # number of rows in the board
+BOARDWIDTH = 3  # number of columns in the board
+BOARDHEIGHT = 3 # number of rows in the board
 TILESIZE = 80
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
@@ -21,16 +21,23 @@ WHITE =         (255, 255, 255)
 BRIGHTBLUE =    (  0,  50, 255)
 DARKTURQUOISE = (  3,  54,  73)
 GREEN =         (  0, 204,   0)
+RED =           (255,   0,   0)
+BEIGE =         (255, 221, 153)
+LIGHTRED =      (255,  50,  50)
+LIGHTBLUE =     (150, 150, 255)
+GREY =          (100, 100, 100)
 
-BGCOLOR = DARKTURQUOISE
+
+BGCOLOR = BEIGE
 TILECOLOR = GREEN
-TEXTCOLOR = WHITE
-BORDERCOLOR = BRIGHTBLUE
+TEXTCOLOR = BLACK
+TEXTBG = BGCOLOR
+BORDERCOLOR = LIGHTBLUE
 BASICFONTSIZE = 20
 
 BUTTONCOLOR = WHITE
 BUTTONTEXTCOLOR = BLACK
-MESSAGECOLOR = WHITE
+MESSAGECOLOR = DARKTURQUOISE
 
 XMARGIN = int((WINDOWWIDTH - (TILESIZE * BOARDWIDTH + (BOARDWIDTH - 1))) / 2)
 YMARGIN = int((WINDOWHEIGHT - (TILESIZE * BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
@@ -41,20 +48,24 @@ LEFT = 'left'
 RIGHT = 'right'
 
 def main():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, RESET_SURF, RESET_RECT, NEW_SURF, NEW_RECT, SOLVE_SURF, SOLVE_RECT
+    global FPSCLOCK, DISPLAYSURF, BASICFONT, MSG_SURF, MSG_RECT, RESET_SURF, RESET_RECT, NEW_SURF, NEW_RECT, SOLVE_SURF, SOLVE_RECT, ALG_SURF, ALG_RECT, ASTAR_SURF, ASTAR_RECT,STRPS_SURF,  STRPS_RECT
 
     pygame.init()
     FPSCLOCK = pygame.time.Clock()
     DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-    pygame.display.set_caption('Slide Puzzle')
+    pygame.display.set_caption('Solving 8-Puzzle')
     BASICFONT = pygame.font.Font('freesansbold.ttf', BASICFONTSIZE)
 
     # Store the option buttons and their rectangles in OPTIONS.
-    RESET_SURF, RESET_RECT = makeText('Reset',    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 90)
-    NEW_SURF,   NEW_RECT   = makeText('New Game', TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 60)
-    SOLVE_SURF, SOLVE_RECT = makeText('Solve',    TEXTCOLOR, TILECOLOR, WINDOWWIDTH - 120, WINDOWHEIGHT - 30)
+    MSG_SURF,   MSG_RECT   = makeText('MSG',         DARKTURQUOISE, TEXTBG, 10, 60)
+    RESET_SURF, RESET_RECT = makeText('Reset',       TEXTCOLOR,     TEXTBG, WINDOWWIDTH - 120, WINDOWHEIGHT - 90)
+    NEW_SURF,   NEW_RECT   = makeText('New Game',    TEXTCOLOR,     TEXTBG, WINDOWWIDTH - 120, WINDOWHEIGHT - 60)
+    SOLVE_SURF, SOLVE_RECT = makeText('Solve',       TEXTCOLOR,     TEXTBG, WINDOWWIDTH - 120, WINDOWHEIGHT - 30)
+    ALG_SURF,   ALG_RECT   = makeText('Algorithms:', GREY,          TEXTBG, 10,                100)
+    ASTAR_SURF, ASTAR_RECT = makeText('A-Star',      TEXTCOLOR,     TEXTBG, 10,                130)
+    STRPS_SURF, STRPS_RECT = makeText('STRIPS',      TEXTCOLOR,     TEXTBG, 10,                160)
 
-    mainBoard, solutionSeq = generateNewPuzzle(80)
+    mainBoard, solutionSeq = generateNewPuzzle(20)
     SOLVEDBOARD = getStartingBoard() # a solved board is the same as the board in a start state.
     allMoves = [] # list of moves made from the solved configuration
 
@@ -82,6 +93,10 @@ def main():
                     elif SOLVE_RECT.collidepoint(event.pos):
                         resetAnimation(mainBoard, solutionSeq + allMoves) # clicked on Solve button
                         allMoves = []
+                    elif ASTAR_RECT.collidepoint(event.pos):
+                        startAStarAlgorithm(mainBoard, allMoves) # clicked on Solve button
+                    elif STRPS_RECT.collidepoint(event.pos):
+                        startSTRIPSAlgorithm() # clicked on Solve button
                 else:
                     # check if the clicked tile was next to the blank spot
 
@@ -107,7 +122,7 @@ def main():
                     slideTo = DOWN
 
         if slideTo:
-            slideAnimation(mainBoard, slideTo, 'Click tile or press arrow keys to slide.', 8) # show slide on screen
+            slideAnimation(mainBoard, slideTo, 'Click tile or press arrow keys to slide.', 12) # show slide on screen
             makeMove(mainBoard, slideTo)
             allMoves.append(slideTo) # record the slide
         pygame.display.update()
@@ -249,6 +264,9 @@ def drawBoard(board, message):
     DISPLAYSURF.blit(RESET_SURF, RESET_RECT)
     DISPLAYSURF.blit(NEW_SURF, NEW_RECT)
     DISPLAYSURF.blit(SOLVE_SURF, SOLVE_RECT)
+    DISPLAYSURF.blit(ALG_SURF, ALG_RECT)
+    DISPLAYSURF.blit(ASTAR_SURF, ASTAR_RECT)
+    DISPLAYSURF.blit(STRPS_SURF, STRPS_RECT)
 
 
 def slideAnimation(board, direction, message, animationSpeed):
@@ -303,7 +321,7 @@ def generateNewPuzzle(numSlides):
     lastMove = None
     for i in range(numSlides):
         move = getRandomMove(board, lastMove)
-        slideAnimation(board, move, 'Generating new puzzle...', animationSpeed=int(TILESIZE / 3))
+        slideAnimation(board, move, 'Generating new puzzle...', animationSpeed=int(TILESIZE / 2))
         makeMove(board, move)
         sequence.append(move)
         lastMove = move
@@ -327,6 +345,14 @@ def resetAnimation(board, allMoves):
         slideAnimation(board, oppositeMove, '', animationSpeed=int(TILESIZE / 2))
         makeMove(board, oppositeMove)
 
+
+def startAStarAlgorithm(board, allMoves):
+    print 'not yet implemented'
+    return
+
+def startSTRIPSAlgorithm():
+    print 'not yet implemented'
+    return
 
 if __name__ == '__main__':
     main()
