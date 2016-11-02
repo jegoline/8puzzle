@@ -1,0 +1,42 @@
+Initial state: Board(One, Four, Three, Two), Blank(LeftTop)
+Goal state: Board(One, Two, Three, Four), Blank(RightBottom)
+
+Actions:
+               Movea(a, b, c, d)
+               Preconditions: Blank(LeftTop), Board(a, b, c, d)
+               Postconditions: Blank(RightTop), !Blank(LeftTop), Board(b, a, c, d)
+
+
+               Moveb(a, b, c, d)
+               Preconditions: Blank(LeftTop), Board(a, b, c, d)
+               Postconditions: Blank(LeftBottom), !Blank(LeftTop), Board(c, b, a, d)
+
+
+               Movec(a, b, c, d)
+               Preconditions: Blank(RightTop), Board(a, b, c, d)
+               Postconditions: Blank(LeftTop), !Blank(RightTop), Board(b, a, c, d)
+
+
+               Moved(a, b, c, d)
+               Preconditions: Blank(RightTop), Board(a, b, c, d)
+               Postconditions: Blank(RightBottom), !Blank(RightTop), Board(a, d, c, b)
+
+
+               Movee(a, b, c, d)
+               Preconditions: Blank(LeftBottom), Board(a, b, c, d)
+               Postconditions: Blank(LeftTop), !Blank(LeftBottom), Board(c, b, a, d)
+
+
+               Movef(a, b, c, d)
+               Preconditions: Blank(LeftBottom), Board(a, b, c, d)
+               Postconditions: Blank(RightBottom), !Blank(LeftBottom), Board(a, b, d, c)
+
+
+               Moveg(a, b, c, d)
+               Preconditions: Blank(RightBottom), Board(a, b, c, d)
+               Postconditions: Blank(RightTop), !Blank(RightBottom), Board(a, d, c, b)
+
+
+               Moveh(A, B, C, D)
+               Preconditions: Blank(H), Board(A, B, C, D)
+               Postconditions: Blank(G), !Blank(H), Board(A, B, D, C)
