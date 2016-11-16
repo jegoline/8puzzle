@@ -1,0 +1,62 @@
+Initial state: Board(Blank, Three, Five, Two, One, Four)
+Goal state: Board(One, Two, Three, Four, Five, Blank)
+
+Actions:       // Move Right
+               Movea(a, b, c, d, e)
+               Preconditions: Board(Blank, a, b, c, d, e)
+               Postconditions: Board(a, Blank, b, c, d, e)
+
+               Moveb(a, b, c, d, e)
+               Preconditions: Board(a, Blank, b, c, d, e)
+               Postconditions: Board(a, b, Blank, c, d, e)
+
+               Movec(a, b, c, d, e)
+               Preconditions: Board(a, b, c, Blank, d, e)
+               Postconditions: Board(a, b, c, d, Blank, e)
+
+               Moved(a, b, c, d, e)
+               Preconditions: Board(a, b, c, d, Blank, e)
+               Postconditions: Board(a, b, c, d, e, Blank)
+
+               // Move Left
+               Movee(a, b, c, d, e)
+               Preconditions: Board(a, Blank, b, c, d, e)
+               Postconditions: Board(Blank, a, b, c, d, e)
+
+               Movef(a, b, c, d, e)
+               Preconditions: Board(a, b, Blank, c, d, e)
+               Postconditions: Board(a, Blank, b, c, d, e)
+
+               Moveg(a, b, c, d, e)
+               Preconditions: Board(a, b, c, d, Blank, e)
+               Postconditions: Board(a, b, c, Blank, d, e)
+
+               Moveh(a, b, c, d, e)
+               Preconditions: Board(a, b, c, d, e, Blank)
+               Postconditions: Board(a, b, c, d, Blank, e)
+
+               // Move Down
+               Movei(a, b, c, d, e)
+               Preconditions: Board(Blank, a, b, c, d, e)
+               Postconditions: Board(c, a, b, Blank, d, e)
+
+               Movej(a, b, c, d, e)
+               Preconditions: Board(a, Blank, b, c, d, e)
+               Postconditions: Board(a, d, b, c, Blank, e)
+
+               Movek(a, b, c, d, e)
+               Preconditions: Board(a, b, Blank, c, d, e)
+               Postconditions: Board(a, b, e, c, d, Blank)
+
+               // Move Up
+               Movel(a, b, c, d, e)
+               Preconditions: Board(a, b, c, Blank, d, e)
+               Postconditions: Board(Blank, b, c, a, d, e)
+
+               Movem(a, b, c, d, e)
+               Preconditions: Board(a, b, c, d, Blank, e)
+               Postconditions: Board(a, Blank, c, d, b, e)
+
+               Moven(a, b, c, d, e)
+               Preconditions: Board(a, b, c, d, e, Blank)
+               Postconditions: Board(a, b, Blank, d, e, c)
