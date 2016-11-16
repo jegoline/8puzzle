@@ -1,6 +1,9 @@
 import fileinput
 import re
 import sys
+import time
+import os
+import psutil
 
 def join_list(l):
     return ", ".join([str(s) for s in l])
@@ -48,6 +51,7 @@ class World:
         self.goals = set()
         self.known_literals = set()
         self.actions = dict()
+        self.count = 0
     def is_true(self, predicate, literals):
         if predicate not in self.state:
             return False
@@ -74,6 +78,8 @@ class World:
             if not g.reached(self):
                 return False
         return True
+    def getCount(self):
+        return self.count
 
 class Condition:
     def __init__(self, predicate, params, truth=True):
@@ -117,19 +123,29 @@ class Action:
         self.params = params
         self.pre = preconditions
         self.post = postconditions
+        # self.counter = 0
     def generate_groundings(self, world):
         self.grounds = []
         cur_literals = []
+        #print 'start groundings_helper()'
         self.groundings_helper(world.known_literals, cur_literals, self.grounds)
     def groundings_helper(self, all_literals, cur_literals, g):
+        # COUNT = COUNT + 1
+        # self.counter = self.counter + 1
+        # if ((self.counter % 1000) == 0):
+        #     print str(self.counter)
+        # print cur_literals#'start groundings_helper' + str(cur_literals)
         if len(cur_literals) == len(self.params):
+            #print 'if'
             args_map = dict(zip(self.params, cur_literals))
             grounded_pre = [p.ground(args_map) for p in self.pre]
             grounded_post = [p.ground(args_map) for p in self.post]
             g.append(GroundedAction(self, cur_literals, grounded_pre, grounded_post))
             return
         for literal in all_literals:
+            #print 'for'
             if literal not in cur_literals:
+                #print 'for if'
                 self.groundings_helper(all_literals, cur_literals + [ literal ], g)
     def print_grounds(self):
         i = 0
@@ -177,8 +193,8 @@ def create_world(filename):
     postcondRegex = re.compile('post(conditions)?:', re.IGNORECASE)
     pstate = ParseState.INITIAL
     cur_action = None
-    if filename is None:
-        filename = sys.argv[1]
+    # if filename is None:
+    #     filename = sys.argv[1]
 
     # Read file
     with open(filename) as f:
@@ -575,23 +591,47 @@ def print_plan(plan):
     print "Plan: {0}".format(" -> ".join([x.simple_str() for x in plan]))
 
 
+
 def main():
-    w = create_world(None)
+    worlds = []
+    for i in xrange(1, 9): # 1 to 8
+        worlds.append('8-puzzle' + str(i) + '_strips.txt')
 
-    # Did someone start us at the goal?
-    already_solved = w.goal_reached()
-    print "Goal already solved? {0}".format(already_solved)
+    startingTime = time.time()
 
-    if not already_solved:
-        print "Solving..."
-        solution = linear_solver(w)
-        if solution is None:
-            print "No solution found :("
-        else:
-            print "Solved!"
-            print_plan(solution)
-            #from show_strips import show_solution
-            #show_solution(solution)
+
+    i = 0
+    for world in worlds:
+        i = i + 1
+        process = psutil.Process(os.getpid())
+        zeit = time.time()
+        w = create_world(world)
+
+        # Did someone start us at the goal?
+        already_solved = w.goal_reached()
+        print "Goal already solved? {0}".format(already_solved)
+
+        if not already_solved:
+            print "Solving..."
+            solution = linear_solver(w)
+            if solution is None:
+                print "No solution found :("
+            else:
+                print "Solved"
+                print_plan(solution)
+                #from show_strips import show_solution
+                #show_solution(solution)
+
+        print ''
+        print '####### NOT FINISHED YET #######'
+        print 'calculated ' + str(i) + ' of ' + str(len(worlds)) + ' worlds in ' + str(time.time()-startingTime) + " seconds"
+        print 'memory used: ' + str(process.memory_info().rss) + ' byte'
+        print ''
+
+    print ''
+    print '####### FINISHED #######'
+    print 'calculated ' + str(len(worlds)) + ' worlds in ' + str(time.time()-startingTime) + " seconds"
+    print 'memory used: ' + str(process.memory_info().rss) + ' byte'
 
 if __name__ == "__main__":
     main()
