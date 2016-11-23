@@ -3,7 +3,7 @@
 # http://inventwithpython.com/pygame
 # Released under a "Simplified BSD" license
 
-import pygame, sys, random
+import sys, random, astar, time, os, psutil, pygame
 from pygame.locals import *
 
 # Create the constants (go ahead and experiment with different values)
@@ -13,8 +13,9 @@ TILESIZE = 80
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
 FPS = 30
-BLANK = None
+BLANK = 0
 BOARD = []
+GOAL_STATE = [[1, 4, 7], [2, 5, 8], [3, 6, 0]]
 
 #                 R    G    B
 BLACK =         (  0,   0,   0)
@@ -103,6 +104,13 @@ def getStartingBoard():
     # returns [[1, 4, 7], [2, 5, 8], [3, 6, BLANK]]
     counter = 1
     board = []
+    # for x in range(BOARDWIDTH):
+    #     column = []
+    #     for y in range(BOARDHEIGHT):
+    #         column.append(counter)
+    #         counter += BOARDWIDTH
+    #     board.append(column)
+    #     counter -= BOARDWIDTH * (BOARDHEIGHT - 1) + BOARDWIDTH - 1
     for x in range(BOARDWIDTH):
         column = []
         for y in range(BOARDHEIGHT):
@@ -203,16 +211,79 @@ def generateNewPuzzle(numSlides):
 
 
 def calculateAlgorithms():
-    print 'not yet implemented'
+    number_runs = 20
+
+    BOARD = []
 
     # generate random states
-    for i in xrange(0, 300):
-        print i
+    for i in xrange(0, number_runs):
         BOARD.append(generateNewPuzzle(80))
-        print BOARD[i]
+
+
+
 
     # TODO: calculate algorithms here
+
+    for i in xrange(0, number_runs):
+        print BOARD[i]
+
+
+    print 'starting with ' + str(number_runs) + ' runs'
+
+    starting_time = time.time()
+    steps = 0
+    length = 0
+    print 'start A* manhatten distance'
+    for i in xrange(0, number_runs):
+        p,s = startAStarAlgorithmManhatten(BOARD[i])
+        steps = steps + s.num_of_expanded
+        length += len(p)
+    print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+
+    # starting_time = time.time()
+    # steps = 0
+    # length = 0
+    # print 'start A* missplaced tiles'
+    # for i in xrange(0, number_runs):
+    #     p,s = startAStarAlgorithmMissplacedTiles(BOARD[i])
+    #     steps = steps + s.num_of_expanded
+    #     length += len(p)
+    # print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+
+    starting_time = time.time()
+    steps = 0
+    length = 0
+    print 'start Greedy manhatten distance'
+    for i in xrange(0, number_runs):
+        p,s = startGreedyAlgorithmManhatten(BOARD[i])
+        steps = steps + s.num_of_expanded
+        length += len(p)
+    print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+
+    starting_time = time.time()
+    steps = 0
+    length = 0
+    print 'start Greedy misplaced tiles'
+    for i in xrange(0, number_runs):
+        p,s = startGreedyAlgorithmMissplacedTiles(BOARD[i])
+        steps = steps + s.num_of_expanded
+        length += len(p)
+    print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+
+    print 'finished'
     return
+
+def startAStarAlgorithmMissplacedTiles(init_state):
+    return astar.run(init_state, GOAL_STATE, astar.evaluate_a_star, astar.heuristic_misplaced_tiles)
+
+def startAStarAlgorithmManhatten(init_state):
+    return astar.run(init_state, GOAL_STATE, astar.evaluate_a_star, astar.heuristic_manhattan_distance)
+
+def startGreedyAlgorithmMissplacedTiles(init_state):
+    return astar.run(init_state, GOAL_STATE, astar.evaluate_greedy, astar.heuristic_misplaced_tiles)
+
+def startGreedyAlgorithmManhatten(init_state):
+    return astar.run(init_state, GOAL_STATE, astar.evaluate_greedy, astar.heuristic_manhattan_distance)
 
 if __name__ == '__main__':
     main()

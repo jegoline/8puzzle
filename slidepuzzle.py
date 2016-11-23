@@ -3,7 +3,7 @@
 # http://inventwithpython.com/pygame
 # Released under a "Simplified BSD" license
 
-import pygame, sys, random
+import pygame, sys, random, astar
 from pygame.locals import *
 
 # Create the constants (go ahead and experiment with different values)
@@ -13,7 +13,8 @@ TILESIZE = 80
 WINDOWWIDTH = 640
 WINDOWHEIGHT = 480
 FPS = 30
-BLANK = None
+BLANK = 0
+BOARD = []
 
 #                 R    G    B
 BLACK =         (  0,   0,   0)
@@ -65,7 +66,7 @@ def main():
     ASTAR_SURF, ASTAR_RECT = makeText('A-Star',      TEXTCOLOR,     TEXTBG, 10,                130)
     STRPS_SURF, STRPS_RECT = makeText('STRIPS',      TEXTCOLOR,     TEXTBG, 10,                160)
 
-    mainBoard, solutionSeq = generateNewPuzzle(20)
+    mainBoard = generateNewPuzzle(20)
     SOLVEDBOARD = getStartingBoard() # a solved board is the same as the board in a start state.
     allMoves = [] # list of moves made from the solved configuration
 
@@ -310,22 +311,22 @@ def slideAnimation(board, direction, message, animationSpeed):
         FPSCLOCK.tick(FPS)
 
 
-def generateNewPuzzle(numSlides):
-    # From a starting configuration, make numSlides number of moves (and
-    # animate these moves).
-    sequence = []
-    board = getStartingBoard()
-    drawBoard(board, '')
-    pygame.display.update()
-    pygame.time.wait(500) # pause 500 milliseconds for effect
-    lastMove = None
-    for i in range(numSlides):
-        move = getRandomMove(board, lastMove)
-        slideAnimation(board, move, 'Generating new puzzle...', animationSpeed=int(TILESIZE / 2))
-        makeMove(board, move)
-        sequence.append(move)
-        lastMove = move
-    return (board, sequence)
+# def generateNewPuzzle(numSlides):
+#     # From a starting configuration, make numSlides number of moves (and
+#     # animate these moves).
+#     sequence = []
+#     board = getStartingBoard()
+#     drawBoard(board, '')
+#     pygame.display.update()
+#     pygame.time.wait(500) # pause 500 milliseconds for effect
+#     lastMove = None
+#     for i in range(numSlides):
+#         move = getRandomMove(board, lastMove)
+#         slideAnimation(board, move, 'Generating new puzzle...', animationSpeed=int(TILESIZE / 2))
+#         makeMove(board, move)
+#         sequence.append(move)
+#         lastMove = move
+#     return (board, sequence)
 
 
 def resetAnimation(board, allMoves):
@@ -345,13 +346,48 @@ def resetAnimation(board, allMoves):
         slideAnimation(board, oppositeMove, '', animationSpeed=int(TILESIZE / 2))
         makeMove(board, oppositeMove)
 
+def convertMoves(solution):
+    # converts the moves from a algorithmical solution to a slidepuzzle solution
+    moves = [] # stores all slidepuzzle moves
+    lastBlank = 0 # stores the last blank position
+    currBlank = 0 # stores the current blank position
+
+    for i in solution:
+        for j in solution[i]:
+            for k in solution[i][j]:
+                if (solution[i][j][k] == 0):
+                    j = BOARDWIDTH
+                    k = BOARDHEIGHT
+                    if(lastBlank == 0):
+                        lastBlank = 0
+    return moves
+
+
+def generateNewPuzzle(numSlides):
+    # From a starting configuration, make numSlides number of moves
+    board = getStartingBoard()
+    lastMove = None
+    for i in range(numSlides):
+        move = getRandomMove(board, lastMove)
+        makeMove(board, move)
+        lastMove = move
+    return (board)
+
 
 def startAStarAlgorithm(board, allMoves):
-    print 'not yet implemented'
+    # print 'not yet implemented'
+    # print board
+    init_state = [[1, 4, 7], [2, 0, 8], [3, 5, 6]]
+    goal_state = [[1, 4, 7], [2, 5, 8], [3, 6, 0]]
+    print astar.heuristic_misplaced_tiles(init_state, goal_state)
     return
 
 def startSTRIPSAlgorithm():
-    print 'not yet implemented'
+    for i in xrange(0, 300):
+        print i
+        BOARD.append(generateNewPuzzle(80))
+        print BOARD[i]
+    
     return
 
 if __name__ == '__main__':
