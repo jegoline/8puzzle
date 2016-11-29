@@ -1,5 +1,6 @@
 import unittest
 import astar
+import slidepuzzle2
 
 
 class MyTestCase(unittest.TestCase):
@@ -30,13 +31,15 @@ class MyTestCase(unittest.TestCase):
         self.assertEquals(8, astar.heuristic_misplaced_tiles(state, goal_state))
 
     def test_heuristic_city_block(self):
-        state = [[2, 3],
-                 [1, 0]]
+        state = [[7, 2, 4],
+                 [5, 0, 6],
+                 [8, 3, 1]]
 
-        goal_state = [[0, 1],
-                      [2, 3]]
+        goal_state = [[0, 1, 2],
+                      [3, 4, 5],
+                      [6, 7, 8]]
 
-        self.assertEquals(6, astar.heuristic_manhattan_distance(state, goal_state))
+        self.assertEquals(18, astar.heuristic_manhattan_distance(state, goal_state))
 
     def test_get_moves(self):
         state = [[1, 2, 3],

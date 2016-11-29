@@ -1,5 +1,6 @@
 import copy
-from heapq import heappush, heappop
+import sortedcontainers.sorteddict
+from heapq import heappush, heappop, heapify
 
 
 class Node:
@@ -77,7 +78,7 @@ def heuristic_misplaced_tiles(state, goal_state):
     h = 0
     for i in range(len(state)):
         for j in range(len(state[i])):
-            if state[i][j] != goal_state[i][j]:
+            if state[i][j] != 0 and state[i][j] != goal_state[i][j]:
                 h += 1
     return h
 
@@ -86,8 +87,9 @@ def heuristic_manhattan_distance(state, goal_state):
     h = 0
     for i in range(len(state)):
         for j in range(len(state[i])):
-            row, col = find_number(goal_state, state[i][j])
-            h += abs(row - i) + abs(col - j)
+            if state[i][j] != 0:
+                row, col = find_number(goal_state, state[i][j])
+                h += abs(row - i) + abs(col - j)
     return h
 
 
@@ -109,10 +111,16 @@ def run(root_state, goal_state, evaluate, heuristic):
             return create_path(state), Evaluation(len(done))
 
         successors = expand(state)
+        done.append(state.state)
+
         for successor in successors:
-            if successor.state not in done:
-                heappush(frontier, (evaluate(successor, goal_state, heuristic), successor))
-                done.append(successor.state)
+            if successor.state in done:
+                continue
+            duplicates = [(x, y) for (x, y) in frontier if y.state == successor.state]
+            if len(duplicates) != 0 and duplicates[0][1].path_cost > successor.path_cost:
+                frontier.remove(duplicates[0])
+                heapify(frontier)
+            heappush(frontier, (evaluate(successor, goal_state, heuristic), successor))
 
     return None, Evaluation(len(done))
 
