@@ -69,7 +69,8 @@ class World:
         g = GroundedCondition(predicate, literals, truth)
         self.goals.add(g)
     def add_literal(self, literal):
-        self.known_literals.add(literal)
+        if literal not in self.known_literals:
+            self.known_literals.add(literal)
     def add_action(self, action):
         if action.name not in self.actions:
             self.actions[action.name] = action
@@ -193,8 +194,8 @@ def create_world(filename):
     postcondRegex = re.compile('post(conditions)?:', re.IGNORECASE)
     pstate = ParseState.INITIAL
     cur_action = None
-    # if filename is None:
-    #     filename = sys.argv[1]
+    if filename is None:
+        filename = sys.argv[1]
 
     # Read file
     with open(filename) as f:
@@ -367,9 +368,14 @@ def linear_solver(world):
             state.append(GroundedCondition(predicate, literals, True))
 
     goals = list(world.goals)
-    return linear_solver_helper(world, state, goals, [])
+    #return linear_solver_helper(world, state, goals, [])
+    for x in xrange(1, 15):
+        print x
+        possible_solution = linear_solver_helper(world, state, goals, [], x)
+        if possible_solution != None:
+            return possible_solution
 
-def linear_solver_helper(world, state, goals, current_plan, depth = 0):
+def linear_solver_helper(world, state, goals, current_plan, max_depth, depth = 0):
     padding = "".join(["++" for x in range(0,len(current_plan))]) + " "
     plan = []
 
@@ -383,7 +389,7 @@ def linear_solver_helper(world, state, goals, current_plan, depth = 0):
     if len(goals) == 0:
         return plan
 
-    if depth > 15:
+    if depth > max_depth:
         return None
 
     i = 0
@@ -404,7 +410,7 @@ def linear_solver_helper(world, state, goals, current_plan, depth = 0):
                 print ""
             i += 1
             continue
-        
+
         possible_actions = sorted(get_possible_grounds(world, goal), key=lambda c: initial_state_distance(state, c.pre))
 
         # otherwise, we need to find a subgoal that will get us to the goal
@@ -429,14 +435,14 @@ def linear_solver_helper(world, state, goals, current_plan, depth = 0):
                     print padding + "Some preconditions not reachable by any possible action. Skipping..."
                     raw_input("")
                 continue
-            
+
             # check if the action directly contradicts another goal
             if contains_contradiction(goals, action):
                 if debug:
                     print padding + "Action violates another goal state. Skipping..."
                     raw_input("")
                 continue
-            
+
             # if we can't obviously reject it as unreachable, we have to recursively descend.
             if debug:
                 print padding + "Action cannot be trivially rejected as unreachable. Descending..."
@@ -448,9 +454,9 @@ def linear_solver_helper(world, state, goals, current_plan, depth = 0):
 
             current_plan.append(action)
 
-            solution = linear_solver_helper(world, temp_state, subgoals, current_plan, depth = depth + 1)
+            solution = linear_solver_helper(world, temp_state, subgoals, current_plan, max_depth, depth = depth + 1)
 
-            # we were unable to find 
+            # we were unable to find
             if solution is None:
                 if debug:
                     print padding + "No solution found with this action. Skipping..."
@@ -461,11 +467,11 @@ def linear_solver_helper(world, state, goals, current_plan, depth = 0):
                 print padding + "Possible solution found!"
                 raw_input("")
 
-            
+
             # update the state to incorporate the post conditions of our selected action
             for post in action.post:
                 update_state(temp_state, post)
-            
+
             """We need to check if the state deleted any of the previous goals. Three options how to handle this:
             1) Give up
             2) Protect it from happening by backtracking all the way (requires fine-grained tracking of states)
@@ -486,10 +492,10 @@ def linear_solver_helper(world, state, goals, current_plan, depth = 0):
                 [goals.remove(x) for x in clobbered]
                 [goals.append(x) for x in clobbered]
                 i -= clob_len
-                if debug:    
+                if debug:
                     print padding + "New goals: {0}".format(", ".join([str(x) for x in goals]))
                     raw_input("")
-                
+
 
             # add the subplan to the plan
             plan.extend(solution)
@@ -501,7 +507,7 @@ def linear_solver_helper(world, state, goals, current_plan, depth = 0):
 
             # add this action to the plan
             plan.append(action)
-            
+
             if debug:
                 print padding + "New State: " + ", ".join([str(x) for x in state])
                 raw_input("")
@@ -537,11 +543,11 @@ def initial_state_distance(state, preconds):
 
 def satisfied(state, goal):
     condition = weak_find(state, goal)
-    
+
     # we only keep track of positive literals (closed world assumption), so if it's here, it's true
     if goal.truth == True:
         return condition != None
-    
+
     # if it's not here, we assume it's false
     return condition == None
 
@@ -591,11 +597,15 @@ def print_plan(plan):
     print "Plan: {0}".format(" -> ".join([x.simple_str() for x in plan]))
 
 
+def run(filename):
+    main(filename)
 
-def main():
+
+def main(filename):
     worlds = []
-    for i in xrange(1, 9): # 1 to 8
-        worlds.append('8-puzzle' + str(i) + '_strips.txt')
+    for i in xrange(1, 2): # 1 to 1
+        worlds.append('puzzle' + str(i) + '.txt')
+    # worlds.append(filename)
 
     startingTime = time.time()
 
@@ -622,16 +632,16 @@ def main():
                 #from show_strips import show_solution
                 #show_solution(solution)
 
-        print ''
-        print '####### NOT FINISHED YET #######'
-        print 'calculated ' + str(i) + ' of ' + str(len(worlds)) + ' worlds in ' + str(time.time()-startingTime) + " seconds"
-        print 'memory used: ' + str(process.memory_info().rss) + ' byte'
-        print ''
+        # print ''
+        # print '####### NOT FINISHED YET #######'
+        # print 'calculated ' + str(i) + ' of ' + str(len(worlds)) + ' worlds in ' + str(time.time()-startingTime) + " seconds"
+        # print 'memory used: ' + str(process.memory_info().rss) + ' byte'
+        # print ''
 
-    print ''
-    print '####### FINISHED #######'
-    print 'calculated ' + str(len(worlds)) + ' worlds in ' + str(time.time()-startingTime) + " seconds"
-    print 'memory used: ' + str(process.memory_info().rss) + ' byte'
+    # print ''
+    # print '####### FINISHED #######'
+    # print 'calculated ' + str(len(worlds)) + ' worlds in ' + str(time.time()-startingTime) + " seconds"
+    # print 'memory used: ' + str(process.memory_info().rss) + ' byte'
 
 if __name__ == "__main__":
     main()

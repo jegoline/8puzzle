@@ -3,7 +3,7 @@
 # http://inventwithpython.com/pygame
 # Released under a "Simplified BSD" license
 
-import sys, random, astar, time, os, psutil, pygame
+import sys, random, astar, time, os, psutil, pygame, strips, re
 from pygame.locals import *
 
 # Create the constants (go ahead and experiment with different values)
@@ -211,13 +211,13 @@ def generateNewPuzzle(numSlides):
 
 
 def calculateAlgorithms():
-    number_runs = 20
+    number_runs = 3
 
     BOARD = []
 
     # generate random states
     for i in xrange(0, number_runs):
-        BOARD.append(generateNewPuzzle(80))
+        BOARD.append(generateNewPuzzle(4))
 
 
 
@@ -225,20 +225,20 @@ def calculateAlgorithms():
     # TODO: calculate algorithms here
 
     for i in xrange(0, number_runs):
-        print BOARD[i]
+       print BOARD[i]
 
 
     print 'starting with ' + str(number_runs) + ' runs'
 
-    starting_time = time.time()
-    steps = 0
-    length = 0
-    print 'start A* manhatten distance'
-    for i in xrange(0, number_runs):
-        p,s = startAStarAlgorithmManhatten(BOARD[i])
-        steps = steps + s.num_of_expanded
-        length += len(p)
-    print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+    # starting_time = time.time()
+    # steps = 0
+    # length = 0
+    # print 'start A* manhatten distance'
+    # for i in xrange(0, number_runs):
+    #     p,s = startAStarAlgorithmManhatten(BOARD[i])
+    #     steps = steps + s.num_of_expanded
+    #     length += len(p)
+    # print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
 
     # starting_time = time.time()
     # steps = 0
@@ -270,6 +270,15 @@ def calculateAlgorithms():
         length += len(p)
     print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
 
+    starting_time = time.time()
+    print 'start STRIPS'
+    for i in xrange(0, number_runs):
+        stripsCreateFiles(i, BOARD[i])
+    print 'files created'
+    for i in xrange(0, number_runs):
+        startStripsAlgorithm('puzzle' + str(i) + '.txt')
+    print 'solved in ' + str(time.time()-starting_time) + 's'
+
     print 'finished'
     return
 
@@ -284,6 +293,81 @@ def startGreedyAlgorithmMissplacedTiles(init_state):
 
 def startGreedyAlgorithmManhatten(init_state):
     return astar.run(init_state, GOAL_STATE, astar.evaluate_greedy, astar.heuristic_manhattan_distance)
+
+def startStripsAlgorithm(filename):
+    strips.run(filename)
+
+def stripsCreateFiles(i, init_state):
+    f = open('puzzle' + str(i) + '.txt', 'w')
+    s = 'Initial state: Adj(A, B), Adj(B, C), Adj(D, E), Adj(E, F), Adj(G, H), Adj(H, I), Adj(A, D), Adj(B, E), Adj(C, F), Adj(D, G), Adj(E, H), Adj(F, I), Adj(B, A), Adj(C, B), Adj(E, D), Adj(F, E), Adj(H, G), Adj(I, H), Adj(D, A), Adj(E, B), Adj(F, C), Adj(G, D), Adj(H, E), Adj(I, F)'
+    for i in xrange(0, 3):
+        for j in xrange(0, 3):
+            if init_state[i][j] == 0:
+                s = s + ', BlankAt(' + str(numberToLiteral(i+j*3)) + ')'
+            elif init_state[i][j]  == 1:
+                s = s + ', OneAt(' + str(numberToLiteral(i+j*3)) + ')'
+            elif init_state[i][j]  == 2:
+                s = s + ', TwoAt(' + str(numberToLiteral(i+j*3)) + ')'
+            elif init_state[i][j]  == 3:
+                s = s + ', ThreeAt(' + str(numberToLiteral(i+j*3)) + ')'
+            elif init_state[i][j]  == 4:
+                s = s + ', FourAt(' + str(numberToLiteral(i+j*3)) + ')'
+            elif init_state[i][j]  == 5:
+                s = s + ', FiveAt(' + str(numberToLiteral(i+j*3)) + ')'
+            elif init_state[i][j]  == 6:
+                s = s + ', SixAt(' + str(numberToLiteral(i+j*3)) + ')'
+            elif init_state[i][j]  == 7:
+                s = s + ', SevenAt(' + str(numberToLiteral(i+j*3)) + ')'
+            elif init_state[i][j]  == 8:
+                s = s + ', EightAt(' + str(numberToLiteral(i+j*3)) + ')'
+    s = s + '\n'
+    s = s + 'Goal State: OneAt(A), TwoAt(B), ThreeAt(C), FourAt(D), FiveAt(E), SixAt(F), SevenAt(G), EightAt(H), BlankAt(I)\n'
+    s = s + 'Actions:\n'
+    s = s + 'MoveOne(X, Y)\n'
+    s = s + 'Preconditions: OneAt(X), BlankAt(Y), Adj(X, Y)\n'
+    s = s + 'Postconditions: !OneAt(X), !BlankAt(Y), BlankAt(X), OneAt(Y)\n'
+    s = s + 'MoveTwo(X, Y)\n'
+    s = s + 'Preconditions: TwoAt(X), BlankAt(Y), Adj(X, Y)\n'
+    s = s + 'Postconditions: !TwoAt(X), !BlankAt(Y), BlankAt(X), TwoAt(Y)\n'
+    s = s + 'MoveThree(X, Y)\n'
+    s = s + 'Preconditions: ThreeAt(X), BlankAt(Y), Adj(X, Y)\n'
+    s = s + 'Postconditions: !ThreeAt(X), !BlankAt(Y), BlankAt(X), ThreeAt(Y)\n'
+    s = s + 'MoveFour(X, Y)\n'
+    s = s + 'Preconditions: FourAt(X), BlankAt(Y), Adj(X, Y)\n'
+    s = s + 'Postconditions: !FourAt(X), !BlankAt(Y), BlankAt(X), FourAt(Y)\n'
+    s = s + 'MoveFive(X, Y)\n'
+    s = s + 'Preconditions: FiveAt(X), BlankAt(Y), Adj(X, Y)\n'
+    s = s + 'Postconditions: !FiveAt(X), !BlankAt(Y), BlankAt(X), FiveAt(Y)\n'
+    s = s + 'MoveSix(X, Y)\n'
+    s = s + 'Preconditions: SixAt(X), BlankAt(Y), Adj(X, Y)\n'
+    s = s + 'Postconditions: !SixAt(X), !BlankAt(Y), BlankAt(X), SixAt(Y)\n'
+    s = s + 'MoveSeven(X, Y)\n'
+    s = s + 'Preconditions: SevenAt(X), BlankAt(Y), Adj(X, Y)\n'
+    s = s + 'Postconditions: !SevenAt(X), !BlankAt(Y), BlankAt(X), SevenAt(Y)\n'
+    s = s + 'MoveEight(X, Y)\n'
+    s = s + 'Preconditions: EightAt(X), BlankAt(Y), Adj(X, Y)\n'
+    s = s + 'Postconditions: !EightAt(X), !BlankAt(Y), BlankAt(X), EightAt(Y)\n'
+    f.write(s)
+
+def numberToLiteral(tileAt):
+    if tileAt == 0:
+        return 'A'
+    elif tileAt == 1:
+        return 'B'
+    elif tileAt == 2:
+        return 'C'
+    elif tileAt == 3:
+        return 'D'
+    elif tileAt == 4:
+        return 'E'
+    elif tileAt == 5:
+        return 'F'
+    elif tileAt == 6:
+        return 'G'
+    elif tileAt == 7:
+        return 'H'
+    elif tileAt == 8:
+        return 'I'
 
 if __name__ == '__main__':
     main()
