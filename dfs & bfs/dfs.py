@@ -3,6 +3,8 @@ import numpy as np
 import sys
 
 
+
+
 r = 3
 c = 3
 
@@ -142,9 +144,7 @@ def cur_state(node,visited,goal,start):
       #  print(node.moves[0])
         node.moves.pop(0)
         state = temp1.ravel()  # make temp flat
-        print "1st state", state
         state = int(''.join(map(str, state)))
-        print "2nd state", state
         v=False
 
 
@@ -155,13 +155,11 @@ def cur_state(node,visited,goal,start):
          # node.visited = True
          new_moves= legal_moves(temp1)
          d = node.depth + 1
-         print ("appending ", temp1)
          children = node.add_child(create_node(temp1, node, None, new_moves, d, False))
     else:
         v=True
-    print goal
     if np.all(node.board == goal):  # Checking is the current board is winning
-        print('I won!!')
+        print "I won!! My board is \n", node.board ,"\n and my tree depth is ", node.depth
         goalReached = True
 
     return start, goalReached, v
@@ -299,12 +297,13 @@ class Node:
 def main():
     states = []
 
-    board = np.array([[1, 4, 0], [3, 2, 5], [8, 6, 7]])
+    #board = np.array([[1, 4, 0], [3, 2, 5], [8, 6, 7]])
     #board =np.array([[2, 8, 3], [1, 6, 4], [7, 0, 5]])
     #board = np.array([[1, 2, 3, ], [4, 0, 5], [6, 7, 8]])
     #board = np.array([[2, 8,3], [1, 6, 4], [7, 0, 5]])
     #board = np.array([[3, 1,2], [0, 4, 5], [6, 7 , 8]])
     #board = np.array([[1, 0, 3, ], [4, 2, 5], [6, 7, 8]])
+    board = np.array([[5, 7, 3, ], [0, 4, 1], [2, 6, 8]])
 
 
     moves = legal_moves(board)
@@ -315,11 +314,11 @@ def main():
     states = createStateList(board)
 
     s = setStates(states,board)
-    print s
-    #dfs(root, s, 20)
+    print "Statrting the game.. My target goal is \n", s
+    dfs(root, s, 500000)
 
 
-    bfs(root, s, 50)
+    bfs(root, s, 500000)
 
 if __name__ == '__main__':
     main()
