@@ -142,7 +142,9 @@ def cur_state(node,visited,goal,start):
       #  print(node.moves[0])
         node.moves.pop(0)
         state = temp1.ravel()  # make temp flat
+        print "1st state", state
         state = int(''.join(map(str, state)))
+        print "2nd state", state
         v=False
 
 
@@ -157,8 +159,8 @@ def cur_state(node,visited,goal,start):
          children = node.add_child(create_node(temp1, node, None, new_moves, d, False))
     else:
         v=True
-
-    if np.all(state == goal):  # Checking is the current board is winning
+    print goal
+    if np.all(node.board == goal):  # Checking is the current board is winning
         print('I won!!')
         goalReached = True
 
@@ -181,22 +183,27 @@ def bfs(node, goal, depth):
 
         if len(nodes)==0 and start==True:       #Appending the root node
 
-            start,goalReached, v = cur_state(node,visited,goalStateB,start)
+            start,goalReached, v = cur_state(node,visited,goal,start)
             nodes.append(node)
 
         elif len(node.moves)!=0 and node.depth<depth_limit:
 
-            start, goalStateB, v = cur_state(node, visited, goalStateB,start)
+            start, goalReached, v = cur_state(node, visited, goal,start)
             if node.has_children():
                 child = node.children.pop(0)
                 nodes.append(child)
+            elif goalReached:
+                break
            # elif v:
              #   m = list(node.moves)
                # m.pop(0)
         elif len(node.moves)== 0 and node.depth < depth_limit:
-
+            if len(nodes) > 1:
                 nodes.pop(0)
-                node=nodes[0]
+                node = nodes[0]
+            else:
+                print "I explored the tree to the given maximum depth"
+                break
         elif len(node.moves)==0 and node.parent!=None:
             node=node.parent
         elif node.depth == depth_limit:
@@ -224,11 +231,11 @@ def dfs(node, goal, depth):
 
         if len(nodes)==0 and start==True:       #Appending the root node
 
-            start,goalReached, v = cur_state(node,visited,goalStateB,start)
+            start,goalReached, v = cur_state(node,visited,goal,start)
             nodes.append(node)
 
         elif len(node.moves)!=0 and node.depth<depth_limit:
-            start, goalStateB, v = cur_state(node, visited, goalStateB,start)
+            start, goalReached, v = cur_state(node, visited, goal,start)
             if node.has_children():
                 node = node.children.pop(0)
                 nodes.append(node)
@@ -292,11 +299,13 @@ class Node:
 def main():
     states = []
 
-    #board = np.array([[1, 4, 0], [3, 2, 5], [8, 6, 7]])
+    board = np.array([[1, 4, 0], [3, 2, 5], [8, 6, 7]])
     #board =np.array([[2, 8, 3], [1, 6, 4], [7, 0, 5]])
-    board = np.array([[1, 2, 3, ], [4, 0, 5], [6, 7, 8]])
+    #board = np.array([[1, 2, 3, ], [4, 0, 5], [6, 7, 8]])
     #board = np.array([[2, 8,3], [1, 6, 4], [7, 0, 5]])
-    #board = np.array([[3, 1,2], [0, 6, 4], [7, 8, 5]])
+    #board = np.array([[3, 1,2], [0, 4, 5], [6, 7 , 8]])
+    #board = np.array([[1, 0, 3, ], [4, 2, 5], [6, 7, 8]])
+
 
     moves = legal_moves(board)
 
@@ -310,7 +319,7 @@ def main():
     #dfs(root, s, 20)
 
 
-    bfs(root, s, 3)
+    bfs(root, s, 50)
 
 if __name__ == '__main__':
     main()
