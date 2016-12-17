@@ -308,6 +308,7 @@ def main():
     #board = np.array([[1, 0, 3], [4, 2, 5], [6, 7, 8]])
    # board = np.array([[5, 7, 3], [0, 4, 1], [2, 6, 8]])
     #board = np.array([[0, 1, 2], [4, 3, 5], [6, 7, 8]])
+    board = np.array([[3, 1, 2], [0, 4, 5], [6, 7, 8]])
 
 
     moves = legal_moves(board)
@@ -319,9 +320,14 @@ def main():
 
     s = setStates(states,board)
     print "Statrting the game.. My target goal is \n", s
+
+    print "\n"
+
+    print "DFS is searching...\n"
     dfs(root, s, 500000)
 
-
+    print "\n"
+    print "BFS is searching...\n"
     bfs(root, s, 500000)
 
 if __name__ == '__main__':
