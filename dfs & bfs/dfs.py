@@ -163,6 +163,7 @@ def cur_state(node,visited,goal,start, expanded_node):
         print "I won!! My board is \n", node.board ,"\n , my tree depth is ", node.depth , "and the total of expanded nodes is ", expanded_node
         goalReached = True
 
+
     return start, goalReached, v , expanded_node
 
 
@@ -326,9 +327,14 @@ def main():
     print "DFS is searching...\n"
     dfs(root, s, 500000)
 
+    moves_bfs = legal_moves(board)
+    states_bfs = createStateList(board)
+
+    s_bfs = setStates(states_bfs, board)
+    root = Node(board, None, None, moves_bfs, 0, False)
     print "\n"
     print "BFS is searching...\n"
-    bfs(root, s, 500000)
+    bfs(root, s_bfs, 500000)
 
 if __name__ == '__main__':
     main()
