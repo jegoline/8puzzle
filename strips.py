@@ -598,7 +598,7 @@ def print_plan(plan):
 
 
 def run(filename):
-    main(filename)
+    return main(filename)
 
 
 def main(filename):
@@ -619,16 +619,19 @@ def main(filename):
 
         # Did someone start us at the goal?
         already_solved = w.goal_reached()
-        print "Goal already solved? {0}".format(already_solved)
+        # print "Goal already solved? {0}".format(already_solved)
 
         if not already_solved:
             # print "Solving..."
             solution = linear_solver(w)
             if solution is None:
                 print "No solution found :("
+                return -1
             else:
                 # print "Solved"
-                print_plan(solution)
+                # print_plan(solution)
+                # print "expanded: " + str(len(solution)) + " nodes"
+                return len(solution)
                 #from show_strips import show_solution
                 #show_solution(solution)
 
