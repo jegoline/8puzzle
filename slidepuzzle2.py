@@ -3,11 +3,11 @@
 # http://inventwithpython.com/pygame
 # Released under a "Simplified BSD" license
 
-import sys, random, time, os, psutil, pygame, re
+import sys, random, time, os, psutil, pygame, re, astar, strips, dfs
 from pygame.locals import *
 # from astar import astar
-import astar
-import strips
+# import astar
+# import strips
 
 # Create the constants (go ahead and experiment with different values)
 BOARDWIDTH = 3  # number of columns in the board
@@ -214,7 +214,7 @@ def generateNewPuzzle(numSlides):
 
 
 def calculateAlgorithms():
-    number_runs = 2
+    number_runs = 4
 
     BOARD = []
 
@@ -227,64 +227,72 @@ def calculateAlgorithms():
 
     # TODO: calculate algorithms here
 
-    for i in xrange(0, number_runs):
-       print BOARD[i]
+    # for i in xrange(0, number_runs):
+    #    print BOARD[i]
 
 
     print 'starting with ' + str(number_runs) + ' runs'
 
-    starting_time = time.time()
-    steps = 0
-    length = 0
-    print 'start A* manhatten distance'
-    for i in xrange(0, number_runs):
-        p,s = startAStarAlgorithmManhatten(BOARD[i])
-        steps = steps + s.num_of_expanded
-        length += len(p)
-    print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+    # starting_time = time.time()
+    # steps = 0
+    # length = 0
+    # print 'start A* manhatten distance'
+    # for i in xrange(0, number_runs):
+    #     p,s = startAStarAlgorithmManhatten(BOARD[i])
+    #     steps = steps + s.num_of_expanded
+    #     length += len(p)
+    # print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+    #
+    # starting_time = time.time()
+    # steps = 0
+    # length = 0
+    # print 'start A* missplaced tiles'
+    # for i in xrange(0, number_runs):
+    #     p,s = startAStarAlgorithmMissplacedTiles(BOARD[i])
+    #     steps = steps + s.num_of_expanded
+    #     length += len(p)
+    # print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+    #
+    # starting_time = time.time()
+    # steps = 0
+    # length = 0
+    # print 'start Greedy manhatten distance'
+    # for i in xrange(0, number_runs):
+    #     p,s = startGreedyAlgorithmManhatten(BOARD[i])
+    #     steps = steps + s.num_of_expanded
+    #     length += len(p)
+    # print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+    #
+    # starting_time = time.time()
+    # steps = 0
+    # length = 0
+    # print 'start Greedy misplaced tiles'
+    # for i in xrange(0, number_runs):
+    #     p,s = startGreedyAlgorithmMissplacedTiles(BOARD[i])
+    #     steps = steps + s.num_of_expanded
+    #     length += len(p)
+    # print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
 
-    starting_time = time.time()
-    steps = 0
-    length = 0
-    print 'start A* missplaced tiles'
-    for i in xrange(0, number_runs):
-        p,s = startAStarAlgorithmMissplacedTiles(BOARD[i])
-        steps = steps + s.num_of_expanded
-        length += len(p)
-    print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+    # starting_time = time.time()
+    # print 'start STRIPS'
+    # for i in xrange(0, number_runs):
+    #     stripsCreateFiles(i, BOARD[i])
+    # # print 'files created'
+    # steps = 0
+    # length = 0
+    # for i in xrange(0, number_runs):
+    #     p,s = startStripsAlgorithm('puzzle' + str(i) + '.txt')
+    #     steps += s
+    #     length += p
+    # print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
 
-    starting_time = time.time()
-    steps = 0
-    length = 0
-    print 'start Greedy manhatten distance'
-    for i in xrange(0, number_runs):
-        p,s = startGreedyAlgorithmManhatten(BOARD[i])
-        steps = steps + s.num_of_expanded
-        length += len(p)
-    print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
-
-    starting_time = time.time()
-    steps = 0
-    length = 0
-    print 'start Greedy misplaced tiles'
-    for i in xrange(0, number_runs):
-        p,s = startGreedyAlgorithmMissplacedTiles(BOARD[i])
-        steps = steps + s.num_of_expanded
-        length += len(p)
-    print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
-
-    starting_time = time.time()
-    print 'start STRIPS'
-    for i in xrange(0, number_runs):
-        stripsCreateFiles(i, BOARD[i])
-    # print 'files created'
-    steps = 0
-    for i in xrange(0, number_runs):
-        steps += startStripsAlgorithm('puzzle' + str(i) + '.txt')
-    print 'solved in ' + str(time.time()-starting_time) + 's and needed ' + str(steps/number_runs) + ' steps'
+    dfs.main(BOARD)
 
     print 'finished'
     return
+
+def startAlgorithmDfs(init_state):
+    return dfs.main
 
 def startAStarAlgorithmMissplacedTiles(init_state):
     return astar.run(init_state, GOAL_STATE, astar.evaluate_a_star, astar.heuristic_misplaced_tiles)

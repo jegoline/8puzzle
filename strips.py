@@ -5,6 +5,8 @@ import time
 import os
 import psutil
 
+EXPANDED_NODES = 0
+
 def join_list(l):
     return ", ".join([str(s) for s in l])
 
@@ -454,6 +456,9 @@ def linear_solver_helper(world, state, goals, current_plan, max_depth, depth = 0
 
             current_plan.append(action)
 
+            global EXPANDED_NODES
+            EXPANDED_NODES += len(current_plan)
+
             solution = linear_solver_helper(world, temp_state, subgoals, current_plan, max_depth, depth = depth + 1)
 
             # we were unable to find
@@ -626,12 +631,12 @@ def main(filename):
             solution = linear_solver(w)
             if solution is None:
                 print "No solution found :("
-                return -1
+                return -1, EXPANDED_NODES
             else:
                 # print "Solved"
                 # print_plan(solution)
                 # print "expanded: " + str(len(solution)) + " nodes"
-                return len(solution)
+                return len(solution), EXPANDED_NODES
                 #from show_strips import show_solution
                 #show_solution(solution)
 
