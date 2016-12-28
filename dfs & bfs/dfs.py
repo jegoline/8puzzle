@@ -160,7 +160,8 @@ def cur_state(node,visited,goal,start, expanded_node):
     else:
         v=True
     if np.all(node.board == goal):  # Checking is the current board is winning
-        print "I won!! My board is \n", node.board ,"\n , my tree depth is ", node.depth , "and the total of expanded nodes is ", expanded_node
+      #  print "I won!! My board is \n", node.board ,"\n , my tree depth is ", node.depth , "and the total of expanded nodes is ", expanded_node
+        print "Depth ", node.depth, "Exanded Nodes ", expanded_node
         goalReached = True
 
 
@@ -320,11 +321,11 @@ def main():
     states = createStateList(board)
 
     s = setStates(states,board)
-    print "Statrting the game.. My target goal is \n", s
+   # print "Statrting the game.. My target goal is \n", s
 
-    print "\n"
+  #  print "\n"
 
-    print "DFS is searching...\n"
+  #  print "DFS is searching...\n"
     dfs(root, s, 500000)
 
     moves_bfs = legal_moves(board)
@@ -332,8 +333,8 @@ def main():
 
     s_bfs = setStates(states_bfs, board)
     root = Node(board, None, None, moves_bfs, 0, False)
-    print "\n"
-    print "BFS is searching...\n"
+
+ #   print "BFS is searching...\n"
     bfs(root, s_bfs, 500000)
 
 if __name__ == '__main__':
