@@ -286,13 +286,42 @@ def calculateAlgorithms():
     #     length += p
     # print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
 
-    dfs.main(BOARD)
+    # NICOLE: Starting Bfs
+
+    starting_time = time.time()
+    print 'start Bredth-First'
+    steps = 0
+    length = 0
+    for i in xrange(0, number_runs):
+        p,s = startAlgorithmBfs(BOARD[i]) # getting expanded nodes + steps
+        steps += s
+        length += p
+    print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+
+    # NICOLE: Starting Dfs
+
+    starting_time = time.time()
+    print 'start Depth-First'
+    steps = 0
+    length = 0
+    for i in xrange(0, number_runs):
+        p,s = startAlgorithmDfs(BOARD[i]) # getting expanded nodes + steps
+        steps += s
+        length += p
+    print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+
+    # dfs.main(BOARD)
 
     print 'finished'
     return
 
+# NICOLE: Here I call your methods:
+
+def startAlgorithmBfs(init_state):
+    return bfs.run(init_state)
+
 def startAlgorithmDfs(init_state):
-    return dfs.main
+    return dfs.run(init_state)
 
 def startAStarAlgorithmMissplacedTiles(init_state):
     return astar.run(init_state, GOAL_STATE, astar.evaluate_a_star, astar.heuristic_misplaced_tiles)
