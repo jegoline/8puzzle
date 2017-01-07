@@ -132,7 +132,8 @@ def cur_state(node,visited,goal,start, expanded_node):
     goalReached = False
 
     if node.parent==None and start==True:
-        state = node.board.ravel()  # make temp flat
+        temp = np.array(node.board)
+        state = temp.ravel()  # make temp flat
         state = int(''.join(map(str, state)))
         visited.add(state)
         start=False
