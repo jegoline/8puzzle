@@ -318,10 +318,10 @@ def calculateAlgorithms():
 # NICOLE: Here I call your methods:
 
 def startAlgorithmBfs(init_state):
-    return bfs.run(init_state)
+    return dfs.run(init_state,'bfs')
 
 def startAlgorithmDfs(init_state):
-    return dfs.run(init_state)
+    return dfs.run(init_state,'dfs')
 
 def startAStarAlgorithmMissplacedTiles(init_state):
     return astar.run(init_state, GOAL_STATE, astar.evaluate_a_star, astar.heuristic_misplaced_tiles)

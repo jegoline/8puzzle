@@ -165,7 +165,7 @@ def cur_state(node,visited,goal,start, expanded_node):
         goalReached = True
 
 
-    return start, goalReached, v , expanded_node
+    return start, goalReached, v , expanded_node, node.depth
 
 
 def bfs(node, goal, depth):
@@ -185,20 +185,18 @@ def bfs(node, goal, depth):
 
         if len(nodes)==0 and start==True:       #Appending the root node
 
-            start,goalReached, v, expanded_node = cur_state(node,visited,goal,start, expanded_node)
+            start,goalReached, v, expanded_node, node_depth = cur_state(node,visited,goal,start, expanded_node)
             nodes.append(node)
 
         elif len(node.moves)!=0 and node.depth<depth_limit:
 
-            start, goalReached, v , expanded_node = cur_state(node, visited, goal,start, expanded_node)
+            start, goalReached, v , expanded_node, node_depth = cur_state(node, visited, goal,start, expanded_node)
             if node.has_children():
                 child = node.children.pop(0)
                 nodes.append(child)
             elif goalReached:
                 break
-           # elif v:
-             #   m = list(node.moves)
-               # m.pop(0)
+
         elif len(node.moves)== 0 and node.depth < depth_limit:
             if len(nodes) > 1:
                 nodes.pop(0)
@@ -215,7 +213,7 @@ def bfs(node, goal, depth):
             else:
                 print "I explored the tree to the given maximum depth"
                 break
-
+    return expanded_node, node_depth
 
 def dfs(node, goal, depth):
     depth_limit = depth
@@ -234,17 +232,15 @@ def dfs(node, goal, depth):
 
         if len(nodes)==0 and start==True:       #Appending the root node
 
-            start,goalReached, v, expanded_node = cur_state(node,visited,goal,start, expanded_node)
+            start,goalReached, v, expanded_node, node_depth = cur_state(node,visited,goal,start, expanded_node)
             nodes.append(node)
 
         elif len(node.moves)!=0 and node.depth<depth_limit:
-            start, goalReached, v , expanded_node = cur_state(node, visited, goal,start, expanded_node)
+            start, goalReached, v , expanded_node, node_depth = cur_state(node, visited, goal,start, expanded_node)
             if node.has_children():
                 node = node.children.pop(0)
                 nodes.append(node)
-           # elif v:
-             #   m = list(node.moves)
-               # m.pop(0)
+
 
         elif len(node.moves)==0 and node.parent!=None:
             node=node.parent
@@ -253,6 +249,7 @@ def dfs(node, goal, depth):
         elif len(node.moves)==0 and node.parent==None :
             print "explored the tree to its depth limit and i am out of moves"
             break
+    return expanded_node,node_depth
 
 
 
@@ -297,6 +294,21 @@ class Node:
     def get_parent(self):
         if self.parent:
             return self.parent
+def run(board, algo):
+    moves = legal_moves(board)
+    root = Node(board, None, None, moves, 0, False)
+    states = createStateList(board)
+
+    s = setStates(states, board)
+
+    if algo=='dfs':
+        expanded_node, node_depth= dfs(root, s, 500000)
+    elif algo=='bfs':
+        expanded_node, node_depth= bfs(root, s, 500000)
+    else:
+        print 'invalid choice of algorithm'
+
+    return expanded_node, node_depth
 
 
 def main():
@@ -312,30 +324,8 @@ def main():
     #board = np.array([[0, 1, 2], [4, 3, 5], [6, 7, 8]])
     board = np.array([[3, 1, 2], [0, 4, 5], [6, 7, 8]])
 
-
-    moves = legal_moves(board)
-
-
-    root = Node(board, None, None, moves, 0,False)
-
-    states = createStateList(board)
-
-    s = setStates(states,board)
-   # print "Statrting the game.. My target goal is \n", s
-
-  #  print "\n"
-
-  #  print "DFS is searching...\n"
-    dfs(root, s, 500000)
-
-    moves_bfs = legal_moves(board)
-    states_bfs = createStateList(board)
-
-    s_bfs = setStates(states_bfs, board)
-    root = Node(board, None, None, moves_bfs, 0, False)
-
- #   print "BFS is searching...\n"
-    bfs(root, s_bfs, 500000)
+    e, n =run(board,'bfs')
+    print e , n
 
 if __name__ == '__main__':
     main()
