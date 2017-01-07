@@ -162,7 +162,7 @@ def cur_state(node,visited,goal,start, expanded_node):
         v=True
     if np.all(node.board == goal):  # Checking is the current board is winning
       #  print "I won!! My board is \n", node.board ,"\n , my tree depth is ", node.depth , "and the total of expanded nodes is ", expanded_node
-        print "Depth ", node.depth, "Exanded Nodes ", expanded_node
+      #  print "Depth ", node.depth, "Exanded Nodes ", expanded_node
         goalReached = True
 
 
