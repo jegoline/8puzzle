@@ -10,9 +10,6 @@ c = 3
 
 #board =np.array([[2, 8, 3], [1, 6, 4], [7, 0, 5]])
 
-goalStateA = np.array([[1, 2, 3, ], [8, 0, 4], [7, 6, 5]])
-goalStateB = np.array([[0, 1, 2, ], [3, 4, 5], [6, 7, 8]])
-
 
 def getBlankPosition(board):
 
@@ -20,71 +17,6 @@ def getBlankPosition(board):
         for j in range(c):
             if board[i][j] == 0:
                 return (i, j)
-
-
-def goalState(board, x, y):
-    # type: (object, object, object) -> object
-    r = len(board)
-    c = len(board[0])
-
-    count = 0
-
-    for n in range(r):
-        for m in range(c):
-
-            br, bc = getBlankPosition(board)  # Avoiding the blank spot
-
-            if x > n:
-                continue
-            elif x == n and y > m:
-                continue
-
-            elif board[br][bc] == board[n][m]:
-                continue
-            elif board[x][y] > board[n][m]:  # Avoiding to check the blank position
-                count = count + 1
-                # print('my legal moves are ', legal_moves(br,bc))
-    return count
-
-
-def createStateList(board):
-    states = []
-
-    for i in range(r):
-
-        for j in range(c):
-            # print('blank spot is ', br, bc)
-            br, bc = getBlankPosition(board)
-            if board[br][bc] == board[i][j]:
-                continue
-
-            states = states + [i, j]
-
-    return states
-
-
-def setStates(states,board):
-    # making a list with states to check for the N which defined the goalstate
-    #This  fuction decides which one the two goal states will be used based on the method described here http://www.8puzzle.com/8_puzzle_algorithm.html
-
-   # ll = len(states)
-    n = 0
-  #  goalstate = []
-
-    for i in xrange(0, 14, 2):  # hardcoded until a soltuion for  xrange(ll,lt,2) is found
-
-        x = states[i]
-        y = states[i + 1]
-
-        count = goalState(board, x, y)
-        n = n + count
-
-    if n % 2 == 0:  # if N is odd then goalStateA if N even then goalStateB
-        goalstate = goalStateB
-    else:
-        goalstate = goalStateA
-
-    return goalstate
 
 
 def legal_moves(board):                     # Setting a list of legal moves baased on the current position of the blank spot
@@ -162,7 +94,7 @@ def cur_state(node,visited,goal,start, expanded_node):
         v=True
     if np.all(node.board == goal):  # Checking is the current board is winning
       #  print "I won!! My board is \n", node.board ,"\n , my tree depth is ", node.depth , "and the total of expanded nodes is ", expanded_node
-      #  print "Depth ", node.depth, "Exanded Nodes ", expanded_node
+     #   print "Depth ", node.depth, "Exanded Nodes ", expanded_node
         goalReached = True
 
 
@@ -295,17 +227,16 @@ class Node:
     def get_parent(self):
         if self.parent:
             return self.parent
-def run(board, algo):
+
+def run(board, algo , goal):
     moves = legal_moves(board)
     root = Node(board, None, None, moves, 0, False)
-    states = createStateList(board)
 
-    s = setStates(states, board)
 
     if algo=='dfs':
-        expanded_node, node_depth= dfs(root, s, 500000)
+        expanded_node, node_depth= dfs(root, goal, 500000)
     elif algo=='bfs':
-        expanded_node, node_depth= bfs(root, s, 500000)
+        expanded_node, node_depth= bfs(root, goal, 500000)
     else:
         print 'invalid choice of algorithm'
 
@@ -323,7 +254,7 @@ def main():
     #board = np.array([[1, 0, 3], [4, 2, 5], [6, 7, 8]])
    # board = np.array([[5, 7, 3], [0, 4, 1], [2, 6, 8]])
     #board = np.array([[0, 1, 2], [4, 3, 5], [6, 7, 8]])
-    board = np.array([[3, 1, 2], [0, 4, 5], [6, 7, 8]])
+   # board = np.array([[3, 1, 2], [0, 4, 5], [6, 7, 8]])
 
     run(board,'bfs')
 
