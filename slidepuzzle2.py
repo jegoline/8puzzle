@@ -214,7 +214,7 @@ def generateNewPuzzle(numSlides):
 
 
 def calculateAlgorithms():
-    number_runs = 4
+    number_runs = 1
 
     BOARD = []
 
@@ -222,13 +222,29 @@ def calculateAlgorithms():
     for i in xrange(0, number_runs):
         BOARD.append(generateNewPuzzle(3))
 
+    for i in xrange(0, number_runs):
+        BOARD[i] = [[0, 4, 7], [1, 5, 8], [2, 3, 6]] # 2 move
 
+    # BOARD[0] = [[1, 6, 2], [3, 0, 5], [4, 7, 8]] # 30 moves
+    # BOARD[0] = [[4, 0, 7], [1, 5, 8], [2, 3, 6]] # 5 moves
+    # BOARD[0] = [[7, 2, 8], [0, 4, 6], [1, 3, 5]] # 15 moves
+    # BOARD[0] = [[2, 1, 4], [3, 7, 8], [6, 5, 0]] # 20 moves
+    # BOARD[0] = [[1, 8, 2], [5, 4, 6], [7, 0, 3]] # 25 moves; 12s, 9s, 10s
+    # BOARD[0] = [[8, 1, 5], [0, 3, 2], [6, 7, 4]] # 25 moves; 98s, 104s
+    # BOARD[0] = [[2, 0, 8], [4, 5, 6], [1, 3, 7]] # 25 moves; 71s, 88s, 110s
+    # BOARD[0] = [[1, 0, 4], [3, 5, 2], [8, 7, 6]] # 25 moves; 0.1s, 0.08s, 0.09s
+    # BOARD[0] = [[4, 3, 2], [0, 6, 7], [8, 5, 1]] # 25 moves; 10s, 5s, 8s
+    # BOARD[0] = [[7, 1, 4], [3, 8, 0], [2, 6, 5]] # 25 moves; 17s, 14s, 17s
+    # BOARD[0] = [[7, 5, 8], [0, 2, 4], [3, 1, 6]] # 25 moves; 0.3s, 0.3s, 0.3s
+    # BOARD[0] = [[4, 0, 8], [3, 1, 7], [2, 6, 5]] # 25 moves; 19s, 10s, 14s
+    # BOARD[0] = [[1, 6, 4], [5, 7, 0], [2, 8, 3]] # 25 moves; 0.04s, 0.05s, 0.05s
+    # BOARD[0] = [[5, 7, 2], [4, 1, 0], [3, 8, 6]] # 25 moves; 120s, 77s, 85s
 
 
     # TODO: calculate algorithms here
 
-    # for i in xrange(0, number_runs):
-    #    print BOARD[i]
+    for i in xrange(0, number_runs):
+       print BOARD[i]
 
 
     print 'starting with ' + str(number_runs) + ' runs'
@@ -242,7 +258,7 @@ def calculateAlgorithms():
     #     steps = steps + s.num_of_expanded
     #     length += len(p)
     # print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
-    #
+
     # starting_time = time.time()
     # steps = 0
     # length = 0
@@ -252,7 +268,7 @@ def calculateAlgorithms():
     #     steps = steps + s.num_of_expanded
     #     length += len(p)
     # print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
-    #
+
     # starting_time = time.time()
     # steps = 0
     # length = 0
@@ -272,43 +288,43 @@ def calculateAlgorithms():
     #     steps = steps + s.num_of_expanded
     #     length += len(p)
     # print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
-
+    #
+    starting_time = time.time()
+    print 'start STRIPS'
+    for i in xrange(0, number_runs):
+        stripsCreateFiles(i, BOARD[i])
+    # print 'files created'
+    steps = 0
+    length = 0
+    for i in xrange(0, number_runs):
+        p,s = startStripsAlgorithm('puzzle' + str(i) + '.txt')
+        steps += s
+        length += p
+    print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+    #
+    # # NICOLE: Starting Bfs
+    #
     # starting_time = time.time()
-    # print 'start STRIPS'
-    # for i in xrange(0, number_runs):
-    #     stripsCreateFiles(i, BOARD[i])
-    # # print 'files created'
+    # print 'start Bredth-First'
     # steps = 0
     # length = 0
     # for i in xrange(0, number_runs):
-    #     p,s = startStripsAlgorithm('puzzle' + str(i) + '.txt')
+    #     p,s = startAlgorithmBfs(BOARD[i]) # getting expanded nodes + steps
     #     steps += s
     #     length += p
     # print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
-
-    # NICOLE: Starting Bfs
-
-    starting_time = time.time()
-    print 'start Bredth-First'
-    steps = 0
-    length = 0
-    for i in xrange(0, number_runs):
-        p,s = startAlgorithmBfs(BOARD[i]) # getting expanded nodes + steps
-        steps += s
-        length += p
-    print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
-
-    # NICOLE: Starting Dfs
-
-    starting_time = time.time()
-    print 'start Depth-First'
-    steps = 0
-    length = 0
-    for i in xrange(0, number_runs):
-        p,s = startAlgorithmDfs(BOARD[i]) # getting expanded nodes + steps
-        steps += s
-        length += p
-    print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
+    #
+    # # NICOLE: Starting Dfs
+    #
+    # starting_time = time.time()
+    # print 'start Depth-First'
+    # steps = 0
+    # length = 0
+    # for i in xrange(0, number_runs):
+    #     p,s = startAlgorithmDfs(BOARD[i]) # getting expanded nodes + steps
+    #     steps += s
+    #     length += p
+    # print 'solved in ' + str(time.time()-starting_time) + 's and expanded ' + str(steps/number_runs) + ' nodes on average and needed ' + str(length/number_runs) + ' steps'
 
     # dfs.main(BOARD)
 

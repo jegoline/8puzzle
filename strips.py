@@ -603,6 +603,8 @@ def print_plan(plan):
 
 
 def run(filename):
+    global EXPANDED_NODES
+    EXPANDED_NODES = 0
     return main(filename)
 
 
@@ -639,6 +641,8 @@ def main(filename):
                 return len(solution), EXPANDED_NODES
                 #from show_strips import show_solution
                 #show_solution(solution)
+        else:
+            return 0, 0
 
         # print ''
         # print '####### NOT FINISHED YET #######'
