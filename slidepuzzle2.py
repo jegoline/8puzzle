@@ -4,6 +4,7 @@
 # Released under a "Simplified BSD" license
 
 import sys, random, time, os, psutil, pygame, re, astar, strips, dfs
+import numpy as np
 from pygame.locals import *
 # from astar import astar
 # import astar
@@ -334,10 +335,10 @@ def calculateAlgorithms():
 # NICOLE: Here I call your methods:
 
 def startAlgorithmBfs(init_state):
-    return dfs.run(init_state,'bfs')
+    return dfs.run(init_state,'bfs', GOAL_STATE)
 
 def startAlgorithmDfs(init_state):
-    return dfs.run(init_state,'dfs')
+    return dfs.run(init_state,'dfs', GOAL_STATE)
 
 def startAStarAlgorithmMissplacedTiles(init_state):
     return astar.run(init_state, GOAL_STATE, astar.evaluate_a_star, astar.heuristic_misplaced_tiles)
